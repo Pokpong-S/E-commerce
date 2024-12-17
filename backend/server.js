@@ -11,14 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 5173 ;
 app.use(express.json());
 app.use("/api/products", productRoutes);
-app.use('/auth',
-    async (req, res, next) => {
-        try {
-            userRoutes
-        } catch (error) {
-          next(error);  
-        }
-      });
+app.use('/auth', userRoutes);
 app.use('/admin',adminRoutes);
 app.use('/uploads', express.static(path.join(path.resolve(), '.../uploads')));
 app.get('/test',(req, res) => {
