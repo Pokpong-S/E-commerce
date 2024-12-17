@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import Product from '../model/product_model.js';
 dotenv.config();
-const { JWT_SECRET } = process.env;
 
 export const SignUp = async (req, res) => {
     const { username, password } = req.body;
