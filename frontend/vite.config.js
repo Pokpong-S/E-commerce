@@ -15,6 +15,10 @@ export default defineConfig({
       "/auth": {
         target: "http://localhost:5173" ,
       }
+      ,
+      "/cart": {
+        target: "http://localhost:5173" ,
+      }
     }
   }
 })

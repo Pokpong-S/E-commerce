@@ -4,8 +4,7 @@ import {
   Box, 
   Text, 
   VStack, 
-  Button, 
-  useDisclosure, 
+  Button,  
   HStack, 
   Heading, 
   Image, 
@@ -16,13 +15,14 @@ import { useAuthStore } from '../store/auth.js';
 import { useProductstore } from '../store/product.js';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { modalCustomStyles } from '../styles/modalStyles.jsx';
 
 const ProfilePage = () => {
-  const { user, purchaseHistory } = useAuthStore();
+  const { user } = useAuthStore();
   const { products, deleteProduct } = useProductstore();
   const [requestDetails, setRequestDetails] = useState("");
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
+  const [isOpen, setIsOpen] = useState(false);
+  const [purchaseHistory, setPurchaseHistory] = useState([]);
   useEffect(() => {
     Modal.setAppElement('#root'); // Ensure this matches your app's root element
   }, []);
@@ -36,6 +36,31 @@ const ProfilePage = () => {
     }
   };
 
+ 
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const response = await fetch('http://localhost:5173/auth/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${user.token}`
+                    }
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    setPurchaseHistory(data.user.purchaseHistory);
+                } else {
+                    throw new Error(data.message || "Failed to fetch profile");
+                }
+            } catch (error) {
+                toast.error("Failed to load purchase history: " + error.message);
+            }
+        };
+
+        if (user.token) {
+            fetchProfile();
+        }
+    }, [user]);
+  
   const handleRequestSubmit = async () => {
     if (!requestDetails.trim()) {
       toast.error("Please provide details for your request.");
@@ -72,53 +97,40 @@ const ProfilePage = () => {
 
       <VStack align="stretch" spacing={6}>
         {/* Purchase History Section */}
-        <Box>
-          <Heading size="md" mb={2} color="brand.600">Purchase History</Heading>
-          {purchaseHistory.length === 0 ? (
-            <Text>No purchases yet.</Text>
-          ) : (
-            <VStack spacing={4} align="stretch">
-              {purchaseHistory.map((item, idx) => (
-                <HStack key={idx} borderWidth="1px" borderRadius="lg" p={4} spacing={4}>
-                  <Image
-                    src={`http://localhost:5173/uploads/${item.image}`}
-                    alt={item.name}
-                    boxSize="100px"
-                    objectFit="cover"
-                    borderRadius="md"
-                  />
-                  <VStack align="start" spacing={1}>
-                    <Text fontWeight="bold">{item.name}</Text>
-                    <Text>${item.price}</Text>
-                  </VStack>
-                </HStack>
-              ))}
+        <Box p={8}>
+            <Heading mb={4}>Welcome, {user.username}</Heading>
+            <VStack spacing={6}>
+                <Heading size="md">Purchase History</Heading>
+                {purchaseHistory.length > 0 ? (
+                    purchaseHistory.map((item, idx) => (
+                        <HStack key={idx} borderWidth="1px" p={4} borderRadius="lg">
+                            <Image src={`http://localhost:5173/uploads/${item.product.image}`} boxSize="100px" objectFit="cover" />
+                            <VStack align="start">
+                                <Text fontWeight="bold">{item.product}</Text>
+                                <Text>Price: ${item.price}</Text>
+                                <Text>Quantity: {item.quantity}</Text>
+                                <Text>Date: {new Date(item.purchasedAt).toLocaleDateString()}</Text>
+                            </VStack>
+                        </HStack>
+                    ))
+                ) : (
+                    <Text>No purchases yet.</Text>
+                )}
             </VStack>
-          )}
         </Box>
 
         {/* Request to Become a Merchant */}
         {user.role !== 'Merchant' && (
           <Box>
-            <Button onClick={onOpen} colorScheme="cyan" mb={4}>
+            <Button onClick={() => setIsOpen(true)} colorScheme="cyan" mb={4}>
               Request to Become a Merchant
             </Button>
       
             <Modal
               isOpen={isOpen}
-              onRequestClose={onClose}
+              onRequestClose={() => setIsOpen(false)}
               contentLabel="Request to Become a Merchant"
-              style={{
-                overlay: {
-                  backgroundColor: "rgba(0, 0, 0, 0.5)",
-                },
-                content: {
-                  maxWidth: "500px",
-                  margin: "auto",
-                  padding: "20px",
-                  borderRadius: "8px",
-                },
-              }}
+              style={modalCustomStyles}
             >
               <Heading size="lg" mb={4}>Request to Become a Merchant</Heading>
               <Textarea
@@ -127,14 +139,14 @@ const ProfilePage = () => {
                 onChange={(e) => setRequestDetails(e.target.value)}
                 size="md"
               />
-              <VStack mt={4} align="flex-end">
+              <HStack mt={4} align="flex-end">
                 <Button onClick={handleRequestSubmit} colorScheme="blue" mr={2}>
                   Submit
                 </Button>
-                <Button onClick={onClose} colorScheme="gray">
+                <Button onClick={() => setIsOpen(false)} colorScheme="gray">
                   Cancel
                 </Button>
-              </VStack>
+              </HStack>
             </Modal>
           </Box>
         )}
@@ -148,7 +160,7 @@ const ProfilePage = () => {
             ) : (
               <VStack spacing={4} align="stretch">
                 {products
-                  .filter((product) => product.owner === user.username) // Assuming 'owner' is username
+                  .filter((product) => product.owner === user.username) 
                   .map((product) => (
                     <HStack key={product._id} borderWidth="1px" borderRadius="lg" p={4} spacing={4}>
                       <Image

@@ -30,7 +30,7 @@ export const getProducts =  async (req,res) => {
 
 export const create_product = async (req,res) => {
     const { name , price, stock , description } = req.body;
-    const image = req.file?.path;
+    const image = req.file?.path || "bla.png";
     if(!name || !price || !image || !stock ){
         return res.status(400).json({success: false , message : 'please provide all fields'});
     }
@@ -41,12 +41,12 @@ export const create_product = async (req,res) => {
             stock,
             description,
             image,
-            owner: req.user.id,
+            owner: req.user.username,
         });
         await newProduct.save();
         res.status(201).json({success: true , data: newProduct});
     }catch (error){
-        res.status(500).json({success: false , message: 'Server Error'});
+        res.status(500).json({success: false , message: `server error ${error}`});
     }
 }
 

@@ -18,11 +18,10 @@ const productSchema = new mongoose.Schema({
             require: true
         },
         description:{
-            type: String ,
-            require: true
+            type: String 
         },
         owner:{
-            type: mongoose.Schema.Types.ObjectId, 
+            type: String, 
             ref: 'User'
         }
     }, { timestamps: true ,}

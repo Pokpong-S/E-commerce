@@ -2,8 +2,10 @@ import { create } from "zustand";
 import axios from "axios";
 import Cookies from "js-cookie";
 
+const storedUser = Cookies.get("user") ? JSON.parse(Cookies.get("user")) : null;
+
 export const useAuthStore = create((set) => ({
-  user: null,
+  user: storedUser,
   error: null,
   loading: false,
 
@@ -13,13 +15,13 @@ export const useAuthStore = create((set) => ({
       const res = await axios.post("http://localhost:5173/auth/signup", 
         { username, password },
         { 'Content-Type': 'application/json'}
-      )
-      const { user , token } = res.data;
+      );
+      const { user, token } = res.data;
       Cookies.set("user", JSON.stringify({ username: user.username, token }), { expires: 30 });
-      set({ user: { username: user.username, token }, loading: false });
+      set({ user: { username: user.username, role: user.role, token }, loading: false });
       return user;
     } catch (err) {
-      console.log("error",err);
+      console.log("error", err);
       const errorMessage = err.response?.data?.message || "Signup failed. Please try again.";
       set({ error: errorMessage, loading: false });
       throw new Error(errorMessage);
@@ -35,7 +37,7 @@ export const useAuthStore = create((set) => ({
       );
       const { user, token } = res.data;
       Cookies.set("user", JSON.stringify({ username: user.username, token }), { expires: 30 });
-      set({ user: { username: user.username, token }, loading: false });
+      set({ user: { username: user.username, role: user.role, token }, loading: false });
       return user;
     } catch (err) {
       console.error("Login error:", err);

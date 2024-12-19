@@ -10,7 +10,7 @@ const Login = () => {
         username: '',
         password: '' 
     });
-    const { login, loading} = useAuthStore();
+    const {user, login, loading} = useAuthStore();
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -21,14 +21,15 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Sending data to server:", formData);
+    // console.log("Sending data to server:", formData);
 
     try {
       await login(formData.username, formData.password);
-      toast.success('Login successful!');
+      toast.success('login success');
       navigate('/');
     } catch (err) {
-      toast.error(err.message || "Login failed. Please check your credentials and try again.");
+      console.log(`error login ${err.meesage}`)
+      toast.error(err.message || "Login failed. Please try again.");
     }
   };
 

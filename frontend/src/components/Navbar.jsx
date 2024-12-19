@@ -47,7 +47,7 @@ const Navbar = () => {
                   <Button>Admin</Button>
                 </Link>
               )}
-              <Button onClick={logout}>Logout</Button>
+              <Button onClick={() => { navigate('/') ,logout}}>Logout</Button>
             </>
           ) : (
             <>

@@ -1,131 +1,106 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Button, VStack, Text, HStack, Image, Spinner} from '@chakra-ui/react';
-import { Alert } from '@chakra-ui/react';
-import { InfoIcon } from '@chakra-ui/icons'; 
-import { useAuthStore } from '../store/auth';
+import React, { useEffect } from "react";
+import { Box, Button, Text, VStack, HStack, Separator,Spinner, Heading} from "@chakra-ui/react";
+import { useCartStore } from "../store/cart.js";
+import { toast} from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-
+import 'react-toastify/dist/ReactToastify.css';
 const CartPage = () => {
-  const [cart, setCart] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [buying, setBuying] = useState(false);
-  const { user, token } = useAuthStore();
+  const { cart, getCart, removeFromCart, updateCartQuantity,
+    buyCartItems, loading, error, successMessage,
+  } = useCartStore();
   const navigate = useNavigate();
-
-  const fetchCart = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/cart', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setCart(data.data);
-      } else {
-        setError(data.message);
+  const handleBuy = async (e) => {
+      e.preventDefault();
+      // console.log("Sending data to server:", formData);
+  
+      try {
+        await buyCartItems();
+        toast.success('you purchase complete');
+        toast.info('you can check purchaseHistory in your profile');
+        // navigate('/');
+      } catch (err) {
+        console.log(`error buying ${err}`)
+        toast.error(err.message || "Login failed. Please try again.");
       }
-    } catch (err) {
-      setError('An error occurred while fetching the cart.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (productId) => {
-    try {
-      const res = await fetch(`/api/cart/${productId}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setCart(data.data);
-      } else {
-        setError(data.message);
-      }
-    } catch (err) {
-      setError('An error occurred while deleting the item.');
-    }
-  };
-
-  const handleBuy = async () => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-
-    setBuying(true);
-    try {
-      const res = await fetch('/api/cart/buy', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
-      if (res.ok) {
-        alert('Purchase successful!');
-        setCart(null); 
-      } else {
-        setError(data.message);
-      }
-    } catch (err) {
-      setError('An error occurred while purchasing items.');
-    } finally {
-      setBuying(false);
-    }
   };
 
   useEffect(() => {
-    fetchCart();
-  }, []);
-
-  if (loading) return <Spinner size="xl" color="brand.500" />;
-
-  if (error) {
-    return (
-      <Alert status="error" mb={4}>
-        <InfoIcon boxSize={4} mr={2} />
-        {error}
-      </Alert>
-    );
-  }
+    getCart();
+  }, [getCart]);
 
   return (
     <Box p={8}>
-      <Text fontSize="2xl" mb={4}>Your Cart</Text>
-      {cart && cart.products.length === 0 ? (
+      <Heading mb={6}>Shopping Cart</Heading>
+        
+      {loading ? (
+        <Spinner size="xl" color="brand.500" /> 
+      ) : Array.isArray(cart) && cart.length === 0 ? (
         <Text>Your cart is empty.</Text>
-      ) : (
-        <VStack spacing={4} align="stretch">
-          {cart.products.map((item) => (
-            <HStack key={item.product._id} justifyContent="space-between" borderWidth="1px" p={4} borderRadius="lg">
-              <HStack spacing={4}>
-                <Image
-                  src={`http://localhost:5000/uploads/${item.product.image}`}
-                  alt={item.product.name}
-                  boxSize="80px"
-                  objectFit="cover"
-                  borderRadius="md"
-                />
-                <VStack align="start" spacing={1}>
-                  <Text fontWeight="bold">{item.product.name}</Text>
-                  <Text>Quantity: {item.quantity}</Text>
-                  <Text>${item.product.price}</Text>
+      ) : Array.isArray(cart) ? (
+        <VStack spacing={6} align="stretch">
+          {cart.map((item) => (
+            <Box
+              key={item.product?._id || item._id} 
+              p={4}
+              borderWidth="1px"
+              borderRadius="lg"
+              boxShadow="sm"
+            >
+              <HStack justify="space-between">
+                <VStack align="start">
+                  <Text fontSize="lg" fontWeight="bold">
+                    {item?.product?.name || "Unknown Product"}
+                  </Text>
+                  <Text>
+                    Price: ${item?.product?.price ? item.product.price.toFixed(2) : "N/A"}
+                  </Text>
+                  <HStack>
+                    <Button
+                      size="sm"
+                      onClick={() => updateCartQuantity(item.product?._id, item.quantity-1)}
+                      isDisabled={item.quantity <= 1}
+                    >
+                      -
+                    </Button>
+                    <Text>{item.quantity || 1}</Text>
+                    <Button
+                      size="sm"
+                      onClick={() => updateCartQuantity(item.product?._id, item.quantity+1)}
+                    >
+                      +
+                    </Button>
+                  </HStack>
+                  <Button
+                    colorScheme="red"
+                    size="sm"
+                    onClick={() => removeFromCart(item.product?._id)}
+                  >
+                    Delete
+                  </Button>
                 </VStack>
+                <Text fontWeight="bold">
+                  Subtotal: ${((item.quantity || 0) * (item.product?.price || 0)).toFixed(2)}
+                </Text>
               </HStack>
-              <Button colorScheme="red" onClick={() => handleDelete(item.product._id)}>Remove</Button>
-            </HStack>
+            </Box>
           ))}
-          <Button colorScheme="green" mt={4} onClick={handleBuy} isLoading={buying}>
-            Buy Now
-          </Button>
+
+          <Separator />
+
+          <HStack justify="space-between">
+            <Text fontSize="xl" fontWeight="bold">
+              Total: $
+              {cart
+                .reduce((total, item) => total + (item.quantity || 0) * (item.product?.price || 0), 0)
+                .toFixed(2)}
+            </Text>
+            <Button colorScheme="teal" onClick={handleBuy}>
+              Buy Now
+            </Button>
+          </HStack>
         </VStack>
+      ) : (
+        <Text>Loading...</Text>
       )}
     </Box>
   );

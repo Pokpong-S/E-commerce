@@ -2,9 +2,7 @@ import User from '../model/user_model.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
-import Product from '../model/product_model.js';
 dotenv.config();
-const { JWT_SECRET } = process.env;
 
 export const SignUp = async (req, res) => {
     const { username, password } = req.body;
@@ -17,11 +15,18 @@ export const SignUp = async (req, res) => {
     try {
         const newUser = new User({
             username,
-            password
+            password,
+            purchaseHistory: [],
+            Cart: [],
         });
         await newUser.save();
-        console.log("User registered successfully:", newUser);
-        res.status(201).json({ success: true, message: 'User registered successfully', user: newUser });
+        const token = jwt.sign(
+            { userId: newUser._id, username: newUser.username, role: newUser.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '2d' }
+        );
+        // console.log("User registered successfully:", newUser);
+        res.status(201).json({ user: { username: newUser.username, role: newUser.role }, token });
     } catch (error) {
         console.error('SignUp Error:', error); 
         res.status(500).json({ success: false, message: "Server Error "});
@@ -29,17 +34,17 @@ export const SignUp = async (req, res) => {
 };
 
 
-
 export const Login = async (req, res) => {
     const {username, password} = req.body;
+    console.log(`request login ${username}`);
     try {
         const user = await User.findOne({ username });
         if(!user){
-            return res.status(401).json({success: false , message: 'Invalid credentials'});
+            return res.status(401).json({success: false , message: 'wrong username or password'});
         }
         const isMatch = await bcrypt.compare(password, user.password);
         if(!isMatch){
-            return res.status(401).json({success: false , message: 'Invalid credentials'});
+            return res.status(401).json({success: false , message: 'wrong username or password'});
         }
 
         const token = jwt.sign(
@@ -77,31 +82,9 @@ export const Request2be = async (req, res) => {
 
 export const getProfile = async (req, res ) => {
     try{
-        const user = await User.findById(req.user.id).populate('purchaseHistory');
+        const user = await User.findById(req.user.userId).populate('purchaseHistory');
         if(!user) return res.status(404).json({suceess: false, message: 'usernot found'});
         res.json({success: true , user});
-    }catch (error){
-        res.status(500).json({success: false , message: 'Server Error'});
-    }
-}
-
-export const purchaseItems = async (req, res) =>{
-    const {items} = req.body;
-    try {
-        const user = await User.findById(req.user.id);
-        if(!user)return res.status(404).json({success: false , message: 'User not found'});
-        for(let item of items){
-            const product = await Product.findById(item._id);
-            if(product && product.stock >= 1){
-                product.stock -= 1;
-                await product.save();
-                user.purchaseHistory.push(product);
-            }else{
-                return res.status(400).json({success: false, message : `${item.name} is out of stock`});
-            }
-        }
-        await user.save();
-        res.json({success: true, message: 'puechase successful'})
     }catch (error){
         res.status(500).json({success: false , message: 'Server Error'});
     }

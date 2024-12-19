@@ -21,10 +21,38 @@ const userSchema = new mongoose.Schema({
     },
     purchaseHistory: [
         {
+            product: {
+                type: String,
+                ref: 'Product',
+                required: true
+            },
+            price: {
+                type: Number,
+                required: true,
+            },
+            quantity: {
+                type: Number,
+                required: true,
+            },
+            purchasedAt: {
+              type: Date,
+              default: Date.now,
+            },
+            
+        }
+    ],
+    Cart: [{
+        product: {
             type: mongoose.Schema.Types.ObjectId ,
-            ref: 'Product'
-        },
-    ]
+            ref: "Product" ,
+            required: true
+        } ,
+        quantity: {
+            type: Number ,
+            required: true
+        }
+    }]
+
 });
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next(); 
