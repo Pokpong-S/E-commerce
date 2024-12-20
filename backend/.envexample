@@ -1,0 +1,3 @@
+MONGO_URI = yourURI
+PORT = PORT
+JWT_SECRET = string

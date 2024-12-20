@@ -2,11 +2,15 @@ import User from '../model/user_model.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
+import validator from 'validator';
 dotenv.config();
 
 export const SignUp = async (req, res) => {
     const { username, password } = req.body;
-    console.log("Received signup data:", req.body); 
+    // console.log("Received signup data:", req.body); 
+      if (!validator.isStrongPassword(password)) {
+        return res.status(100).json({ success: false, message: 'password not strong.' });
+      }
     const existingUser = await User.findOne({ username });
     if (existingUser) {
         // console.log("Username already taken:", username);
@@ -26,7 +30,7 @@ export const SignUp = async (req, res) => {
             { expiresIn: '2d' }
         );
         // console.log("User registered successfully:", newUser);
-        res.status(201).json({ user: { username: newUser.username, role: newUser.role }, token });
+        return res.status(201).json({ user: { username: newUser.username, role: newUser.role }, token });
     } catch (error) {
         console.error('SignUp Error:', error); 
         res.status(500).json({ success: false, message: "Server Error "});
@@ -52,7 +56,7 @@ export const Login = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '2d' }
         );
-        res.status(200).json({ user: { username: user.username, role: user.role }, token });
+        return res.status(200).json({ user: { username: user.username, role: user.role }, token });
     } catch (error) {
         console.error("Login error:", error);
         res.status(500).json({success: false , message: "Internal Server Error"});
@@ -61,7 +65,7 @@ export const Login = async (req, res) => {
 
 export const Request2be = async (req, res) => {
     try{
-        const user = await User.findById(req.user.id);
+        const user = await User.findById(req.user.userId);
         if(!user) return res.status(404).json({success: false,message: 'User not found' });
 
         if(user.roleRequest === 'Merchant'){

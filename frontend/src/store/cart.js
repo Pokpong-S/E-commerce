@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 import { useAuthStore } from "./auth";
-
+const base = import.meta.env.base_port;
 export const useCartStore = create((set, get) => ({
   cart: [],
   loading: false,
@@ -12,14 +12,14 @@ export const useCartStore = create((set, get) => ({
     try {
       set({ loading: true, error: null, successMessage: null });
       const { user } = useAuthStore.getState();
-      console.log(`token ${user?.token}`);
+      // console.log(`token ${user?.token}`);
       if (!user?.token) {
-        console.log(`token ${user?.token}`);
+        // console.log(`token ${user?.token}`);
         set({ error: "Authentication token not found", loading: false });
         return;
       }
 
-      const response = await axios.get("/cart", 
+      const response = await axios.get(`${base}/cart`, 
         {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -49,7 +49,7 @@ export const useCartStore = create((set, get) => ({
       }
 
       const response = await axios.post(
-        "/cart",
+        `${base}/cart`,
         { productId, quantity },
         {
           headers: {
@@ -64,7 +64,7 @@ export const useCartStore = create((set, get) => ({
       });
     }
   },
-
+  // not in use 
   removeFromCart: async (productId) => {
     try {
       set({ error: null, successMessage: null ,loading: true});
@@ -76,13 +76,13 @@ export const useCartStore = create((set, get) => ({
         return;
       }
 
-      const response = await axios.delete(`http://localhost:5173/cart/${productId}`,
+      const response = await axios.delete(`${base}/cart/${productId}`,
          {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       });
-      set({ cart: response.data.cart || [] ,loading: false, successMessage: "Product removed from cart" });
+      set({ cart: response.data.cart ,loading: false, successMessage: "Product removed from cart" });
     } catch (error) {
       console.log(`removefromcart : ${error}`)
       set({ 
@@ -103,7 +103,7 @@ export const useCartStore = create((set, get) => ({
       }
 
       const response = await axios.post(
-        `/cart/${productId}`,
+        `${base}/cart/${productId}`,
         { quantity: newQuantity },
         {
           headers: {
@@ -133,7 +133,7 @@ export const useCartStore = create((set, get) => ({
       }
 
       const response = await axios.post(
-        "/cart/buy",
+        `${base}/cart/buy`,
         {}, 
         {
           headers: {

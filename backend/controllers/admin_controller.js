@@ -12,6 +12,7 @@ export const getUsers = async (req, res) => {
     }
 }
 export const ApproveMerchant = async (req, res) => {
+    console.log(`approve request : ${req.params.id}`);
     try {
         const user = await User.findById(req.params.id);
 
@@ -20,7 +21,7 @@ export const ApproveMerchant = async (req, res) => {
         user.role = 'Merchant';
         user.roleRequest = null;
         await user.save();
-        req.status(200).json({sucess: true, message: `${user.username} is now a Merchant` });
+        res.status(200).json({sucess: true, message: `${user.username} is now a Merchant` });
     }catch (error){
         res.status(500).json({success: false , message: 'Server error'});
     }

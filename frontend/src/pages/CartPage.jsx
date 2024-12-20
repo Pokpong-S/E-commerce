@@ -17,7 +17,7 @@ const CartPage = () => {
         await buyCartItems();
         toast.success('you purchase complete');
         toast.info('you can check purchaseHistory in your profile');
-        // navigate('/');
+        navigate('/');
       } catch (err) {
         console.log(`error buying ${err}`)
         toast.error(err.message || "Login failed. Please try again.");
@@ -73,7 +73,7 @@ const CartPage = () => {
                   <Button
                     colorScheme="red"
                     size="sm"
-                    onClick={() => removeFromCart(item.product?._id)}
+                    onClick={() => updateCartQuantity(item.product?._id,0)}
                   >
                     Delete
                   </Button>

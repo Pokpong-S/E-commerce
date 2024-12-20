@@ -9,9 +9,11 @@ import { toast } from "react-toastify";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { useAuthStore } from "../store/auth"; 
 // import { useColorModeValue } from "@chakra-ui/react";
+const base = import.meta.env.base_port;
 Modal.setAppElement("#root");
 
-const ProductCard = ({ product }) => {
+const ProductCard = (prop) => {
+  const{ product } = prop
   const [updatedProduct, setUpdatedProduct] = useState(product);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -32,6 +34,8 @@ const ProductCard = ({ product }) => {
   };
 
   const handleUpdateProduct = async (productID, updatedProduct) => {
+    console.log(`${JSON.stringify(product)} : ${prop.product} : ${product.name} : ${product.price}  ` );
+
     try {
       const { success, message } = await updateProduct(productID, updatedProduct);
 
@@ -71,7 +75,7 @@ const ProductCard = ({ product }) => {
       _hover={{ transform: "translateY(-5px)", shadow: "xl" }}
       bg={bg}
     >
-      <Image src={product.image} alt={product.name} h={48} w="full" objectFit="cover" />
+      <Image src={`${base}/uploads/${product.image}`} alt={product.name} h={48} w="full" objectFit="cover" />
 
       <Box p={4}>
         <Heading as="h3" size="md" mb={2}>
@@ -87,7 +91,7 @@ const ProductCard = ({ product }) => {
             Add to Cart
           </Button>
 
-          {user && user.role === "admin" && (
+          {user && (user.role === "admin" || user.username === product.owner) && (
             <>
               <Button colorScheme="cyan" variant="solid" onClick={() => setIsOpen(true)}>
                 <EditIcon fontSize={15} />
@@ -105,24 +109,22 @@ const ProductCard = ({ product }) => {
           Edit Product
         </Heading>
         <VStack spacing={4}>
+          <Text mb={2}>Product name</Text>
           <Input
             placeholder="Product Name"
             name="name"
             value={updatedProduct.name}
             onChange={(e) => setUpdatedProduct({ ...updatedProduct, name: e.target.value })}
+            required 
           />
+          <Text mb={2}>Price</Text>
           <Input
             placeholder="Price"
             name="price"
             type="number"
             value={updatedProduct.price}
             onChange={(e) => setUpdatedProduct({ ...updatedProduct, price: e.target.value })}
-          />
-          <Input
-            placeholder="Image URL"
-            name="image"
-            value={updatedProduct.image}
-            onChange={(e) => setUpdatedProduct({ ...updatedProduct, image: e.target.value })}
+            required 
           />
         </VStack>
 

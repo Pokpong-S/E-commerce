@@ -69,7 +69,7 @@ export const deleteCartItem = async (req, res) => {
       if (cartItemIndex === -1) {
           return res.status(404).json({ success: false, message: "Product not found in cart" });
       }
-      user.Cart.splice(cartItemIndex, 1);
+      user.Cart = user.Cart.filter(item => item.product.toString() !== productId);
 
       await user.save();
 

@@ -1,9 +1,8 @@
 import { create } from "zustand";
 import axios from "axios";
 import Cookies from "js-cookie";
-
+const base = import.meta.env.base_port;
 const storedUser = Cookies.get("user") ? JSON.parse(Cookies.get("user")) : null;
-
 export const useAuthStore = create((set) => ({
   user: storedUser,
   error: null,
@@ -12,12 +11,12 @@ export const useAuthStore = create((set) => ({
   signup: async (username, password) => {
     set({ loading: true, error: null });
     try {
-      const res = await axios.post("http://localhost:5173/auth/signup", 
+      const res = await axios.post(`${base}/auth/signup`, 
         { username, password },
         { 'Content-Type': 'application/json'}
       );
       const { user, token } = res.data;
-      Cookies.set("user", JSON.stringify({ username: user.username, token }), { expires: 30 });
+      Cookies.set("user", JSON.stringify({ username: user.username, role: user.role , token }), { expires: 30 });
       set({ user: { username: user.username, role: user.role, token }, loading: false });
       return user;
     } catch (err) {
@@ -31,12 +30,12 @@ export const useAuthStore = create((set) => ({
   login: async (username, password) => {
     set({ loading: true, error: null });
     try {
-      const res = await axios.post("http://localhost:5173/auth/login",  
+      const res = await axios.post(`${base}/auth/login`,  
         { username, password },
         { 'Content-Type': 'application/json'}
       );
       const { user, token } = res.data;
-      Cookies.set("user", JSON.stringify({ username: user.username, token }), { expires: 30 });
+      Cookies.set("user", JSON.stringify({ username: user.username , role: user.role, token }), { expires: 30 });
       set({ user: { username: user.username, role: user.role, token }, loading: false });
       return user;
     } catch (err) {

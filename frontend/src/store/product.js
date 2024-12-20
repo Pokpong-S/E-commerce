@@ -1,5 +1,6 @@
 import { create } from "zustand";
-
+import { useAuthStore } from "./auth";
+const base = import.meta.env.base_port;
 export const useProductstore = create((set) => ({
   products: [],
 	setProducts: (products) => set({ products }),
@@ -7,12 +8,22 @@ export const useProductstore = create((set) => ({
 		if (!newProduct.name || !newProduct.image || !newProduct.price) {
 			return { success: false, message: "Please fill in all fields." };
 		}
-		const res = await fetch("http://localhost:5173/api/products", {
+
+		const { user } = useAuthStore.getState();
+
+		const formData = new FormData();
+		formData.append('name', newProduct.name);
+		formData.append('price', newProduct.price);
+		formData.append('stock', newProduct.stock);
+		formData.append('description', newProduct.description);
+		formData.append('image', newProduct.image);
+
+		const res = await fetch(`${base}/api/products`, {
 			method: "POST",
 			headers: {
-				"Content-Type": "application/json",
+				Authorization: `Bearer ${user.token}`,
 			},
-			body: JSON.stringify(newProduct),
+			body: formData,
 		});
 		const data = await res.json();
 		set((state) => ({ products: [...state.products, data.data] }));
@@ -20,7 +31,7 @@ export const useProductstore = create((set) => ({
 	},
 	fetchProducts: async () => {
 		try {
-			const res = await fetch('http://localhost:5173/api/products');
+			const res = await fetch(`${base}/api/products`);
 			const text = await res.json();  
 			// console.log("Raw response:", text);
 		
@@ -37,8 +48,12 @@ export const useProductstore = create((set) => ({
 		}
   },
    deleteProduct: async (Product_id) =>{
-	const res = await fetch(`http://localhost:5173/api/products/${Product_id}`, {
+	const { user } = useAuthStore.getState();
+	const res = await fetch(`${base}/api/products/${Product_id}`, {
 		method: "DELETE",
+		headers: {
+			Authorization: `Bearer ${user.token}`,
+		},
 	}); 
 	const data = await res.json();
 	// console.log("data",data);
@@ -46,20 +61,27 @@ export const useProductstore = create((set) => ({
 	set((state) => ({ products: state.products.filter((product) => product._id !== Product_id) }));
 	return { success: true, message: data.message };
    },
-   updateProduct: async (productID,updatedProduct) => {
-	const res = await fetch(`http://localhost:5173/api/products/${productID}`, {
-		method: "PUT",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(updatedProduct),
-	});
-	const data = await res.json();
-	if(!data.success) return { success: false , message: data.message };
-	set( (state) => ({
-		products: state.products.map( (product) => (product._id === productID ? data.data : product)),
-	}));
+   updateProduct: async (productID, up) => {
+	const updatedProduct = JSON.stringify(up);
+    const { user } = useAuthStore.getState();
+	console.log(`object ${updatedProduct}`);
+	
+    const res = await fetch(`${base}/api/products/${productID}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+      body: updatedProduct
+    });
 
-	return {success: true , message: data.message}; 
-   }
+
+    const data = await res.json();
+    if(!data.success) return { success: false , message: data.message };
+    set( (state) => ({
+      products: state.products.map( (product) => (product._id === productID ? data.data : product)),
+    }));
+
+    return {success: true , message: data.message}; 
+
+  }
 })); 

@@ -3,11 +3,12 @@ import { Container, SimpleGrid, Text, VStack, Spinner } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { useProductstore } from '../store/product';
 import ProductCard from '../components/ProductCard.jsx';
-
+import { useAuthStore } from '../store/auth.js';
 const HomePage = () => {
   const { fetchProducts, products } = useProductstore();
+  const { user } = useAuthStore();
   const [loading, setLoading] = useState(true);
-
+  // console.log( `${user}`);
   useEffect(() => {
     const loadProducts = async () => {
       await fetchProducts();
@@ -20,7 +21,7 @@ const HomePage = () => {
     <Container maxW="container.xl" py={12}>
       <VStack gap="20px">
         <Text
-          fontSize="30"
+          fontSize="50"
           fontWeight="bold"
           bgGradient="to-r"
           gradientFrom="cyan.400"
@@ -43,9 +44,11 @@ const HomePage = () => {
             gap="40px"
             w="full"
           >
-            {products.map((product) => (
-              <ProductCard key={product._id} product={product} />
-            ))}
+            {products.map((product) => {
+                // console.log(product);
+                return <ProductCard key={product._id} product={product} />;
+                
+              })}
           </SimpleGrid>
          )
         }

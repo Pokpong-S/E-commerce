@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuthStore } from '../store/auth';
+import validator from 'validator';
 const SignUp = () => {
     const [formData, setFormData] = useState({
         username: '',
@@ -20,8 +21,13 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match.");
+      return;
+    }
+    if (!validator.isStrongPassword(formData.password)) {
+      toast.error("Passwords not strong.");
       return;
     }
     try {

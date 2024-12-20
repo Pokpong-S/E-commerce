@@ -8,7 +8,7 @@ import {
   HStack, 
   Heading, 
   Image, 
-  Textarea 
+  Textarea
 } from '@chakra-ui/react';
 import Modal from "react-modal";
 import { useAuthStore } from '../store/auth.js';
@@ -17,14 +17,16 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { modalCustomStyles } from '../styles/modalStyles.jsx';
 
+const base = import.meta.env.base_port
+
 const ProfilePage = () => {
   const { user } = useAuthStore();
   const { products, deleteProduct } = useProductstore();
   const [requestDetails, setRequestDetails] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
   const [purchaseHistory, setPurchaseHistory] = useState([]);
+
   useEffect(() => {
-    Modal.setAppElement('#root'); // Ensure this matches your app's root element
+    Modal.setAppElement('#root'); 
   }, []);
 
   const handleDelete = async (id) => {
@@ -36,11 +38,10 @@ const ProfilePage = () => {
     }
   };
 
- 
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await fetch('http://localhost:5173/auth/profile', {
+                const response = await fetch(`${base}/auth/profile`, {
                     headers: {
                         'Authorization': `Bearer ${user.token}`
                     }
@@ -60,7 +61,7 @@ const ProfilePage = () => {
             fetchProfile();
         }
     }, [user]);
-  
+
   const handleRequestSubmit = async () => {
     if (!requestDetails.trim()) {
       toast.error("Please provide details for your request.");
@@ -68,7 +69,7 @@ const ProfilePage = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:5173/auth/request", {
+      const res = await fetch(`${base}/auth/request`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -87,7 +88,7 @@ const ProfilePage = () => {
     } catch (error) {
       toast.error(error.message || "Error submitting request.");
     } finally {
-      onClose();
+      setIsOpen(false);
     }
   };
 
@@ -104,7 +105,6 @@ const ProfilePage = () => {
                 {purchaseHistory.length > 0 ? (
                     purchaseHistory.map((item, idx) => (
                         <HStack key={idx} borderWidth="1px" p={4} borderRadius="lg">
-                            <Image src={`http://localhost:5173/uploads/${item.product.image}`} boxSize="100px" objectFit="cover" />
                             <VStack align="start">
                                 <Text fontWeight="bold">{item.product}</Text>
                                 <Text>Price: ${item.price}</Text>
@@ -120,7 +120,7 @@ const ProfilePage = () => {
         </Box>
 
         {/* Request to Become a Merchant */}
-        {user.role !== 'Merchant' && (
+        {user.role !== 'Merchant' && user.role !== 'admin' && (
           <Box>
             <Button onClick={() => setIsOpen(true)} colorScheme="cyan" mb={4}>
               Request to Become a Merchant
@@ -164,7 +164,7 @@ const ProfilePage = () => {
                   .map((product) => (
                     <HStack key={product._id} borderWidth="1px" borderRadius="lg" p={4} spacing={4}>
                       <Image
-                        src={`http://localhost:5173/uploads/${product.image}`}
+                        src={`${base}/uploads/${product.image}`}
                         alt={product.name}
                         boxSize="100px"
                         objectFit="cover"
@@ -188,6 +188,7 @@ const ProfilePage = () => {
           </Box>
         )}
       </VStack>
+
     </Box>
   );
 };

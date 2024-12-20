@@ -15,13 +15,13 @@ const CreatePage = () => {
   const { createProduct } = useProductstore();
 
   const handleAddProduct = async () => {
-    console.log(`product ${newProduct}`);
+    // console.log(`product ${newProduct}`);
     const { success, message } = await createProduct(newProduct);
 
-    if (!success) {
-			toast.error(message);
+    if (success) {
+			toast.success("Product added successfully!");
 		} else {
-      toast.success("Product added successfully!");
+      toast.error(message);
 		}
     setNewProduct({ name: "", price: "", stock: "", image: "", description: "" });
   };
@@ -46,12 +46,14 @@ const CreatePage = () => {
               name="name"
               value={newProduct.name}
               onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+              required 
             />
             <Input
               placeholder="Describe Product *"
               name="description"
               value={newProduct.description}
               onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+              required 
             />
             <Input
               placeholder="Price *"
@@ -59,6 +61,7 @@ const CreatePage = () => {
               type="number"
               value={newProduct.price}
               onChange={(e) => setNewProduct({ ...newProduct, price: Number(e.target.value) })}
+              required 
             />
             <Input
               placeholder="Stock  *"
@@ -66,14 +69,17 @@ const CreatePage = () => {
               type="number"
               value={newProduct.stock}
               onChange={(e) => setNewProduct({ ...newProduct, stock: Number(e.target.value) })}
+              required 
             />
             <Input
-              placeholder="Image URL"
-              name="image"
-              value={newProduct.image}
-              onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                setNewProduct((prev) => ({ ...prev, image: file }));
+              }}
+              required 
             />
-
             <Button colorScheme={"green"} onClick={handleAddProduct} w={"full"}>
               Add Product
             </Button>

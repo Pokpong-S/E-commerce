@@ -7,7 +7,11 @@ const Navbar = () => {
   const { user, logout } = useAuthStore();
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
-  
+  const handdlelogout = () => {
+    console.log("hilogout");
+    logout();
+    navigate('/');
+  }
   const handleSearch = () => {
     navigate(`/?search=${search}`);
   };
@@ -47,7 +51,7 @@ const Navbar = () => {
                   <Button>Admin</Button>
                 </Link>
               )}
-              <Button onClick={() => { navigate('/') ,logout}}>Logout</Button>
+              <Button onClick={handdlelogout}>Logout</Button>
             </>
           ) : (
             <>
