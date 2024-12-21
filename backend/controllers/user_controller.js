@@ -7,13 +7,11 @@ dotenv.config();
 
 export const SignUp = async (req, res) => {
     const { username, password } = req.body;
-    // console.log("Received signup data:", req.body); 
       if (!validator.isStrongPassword(password)) {
         return res.status(100).json({ success: false, message: 'password not strong.' });
       }
     const existingUser = await User.findOne({ username });
     if (existingUser) {
-        // console.log("Username already taken:", username);
         return res.status(400).json({ success: false, message: 'Username already in use.' });
     }
     try {
@@ -29,7 +27,6 @@ export const SignUp = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '2d' }
         );
-        // console.log("User registered successfully:", newUser);
         return res.status(201).json({ user: { username: newUser.username, role: newUser.role }, token });
     } catch (error) {
         console.error('SignUp Error:', error); 

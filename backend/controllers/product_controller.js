@@ -47,9 +47,13 @@ export const update_product = async (req, res) => {
 	const product = req.body;
     console.log(`product : ${JSON.stringify(product)}`);
 
-	if (!mongoose.Types.ObjectId.isValid(id)) {
-		return res.status(404).json({ success: false, message: "Invalid Product Id" });
-	}
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(404).json({ success: false, message: "Invalid Product Id" });
+    }
+    const pd = await Product.findById(id);
+    if(!pd) return res.status(404).json({success: false,message: 'product not found' });
+
+	
     
 	try {
 		const updatedProduct = await Product.findByIdAndUpdate(id, product, { new: true });

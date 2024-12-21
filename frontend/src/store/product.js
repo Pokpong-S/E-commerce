@@ -64,11 +64,12 @@ export const useProductstore = create((set) => ({
    updateProduct: async (productID, up) => {
 	const updatedProduct = JSON.stringify(up);
     const { user } = useAuthStore.getState();
-	console.log(`object ${updatedProduct}`);
+	console.log(`object : --> ${updatedProduct}`);
 	
     const res = await fetch(`${base}/api/products/${productID}`, {
       method: "PUT",
       headers: {
+		'Content-Type': 'application/json',
         Authorization: `Bearer ${user.token}`,
       },
       body: updatedProduct

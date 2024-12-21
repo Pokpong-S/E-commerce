@@ -15,7 +15,6 @@ const CreatePage = () => {
   const { createProduct } = useProductstore();
 
   const handleAddProduct = async () => {
-    // console.log(`product ${newProduct}`);
     const { success, message } = await createProduct(newProduct);
 
     if (success) {
@@ -23,7 +22,7 @@ const CreatePage = () => {
 		} else {
       toast.error(message);
 		}
-    setNewProduct({ name: "", price: "", stock: "", image: "", description: "" });
+    setNewProduct({ name: "", price: "", stock: "", image: null, description: "" });
   };
 
   return (
@@ -80,7 +79,7 @@ const CreatePage = () => {
               }}
               required 
             />
-            <Button colorScheme={"green"} onClick={handleAddProduct} w={"full"}>
+            <Button colorPalette={"green"} onClick={handleAddProduct} w={"full"}>
               Add Product
             </Button>
           </VStack>

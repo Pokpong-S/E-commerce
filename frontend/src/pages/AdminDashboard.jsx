@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Box,
-  Button,
-  Heading,
-  VStack,
-  Text,
-  HStack,
-  Table
-} from '@chakra-ui/react';
+import { Box, Button, Heading, VStack, Text, HStack, Table } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuthStore } from '../store/auth';
@@ -19,7 +11,6 @@ const AdminDashboard = () => {
   const { user } = useAuthStore();
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
-  const navigate = useNavigate();
 
   const fetchUsers = async () => {
     try {
@@ -108,7 +99,6 @@ const AdminDashboard = () => {
       <Heading mb={4}>Admin Dashboard</Heading>
       <VStack align="stretch" spacing={8}>
 
-        {/* User Management Table */}
         <Box>
           <Heading size="md" mb={2}>User Management</Heading>
           <Table.Root size="sm">
@@ -127,10 +117,10 @@ const AdminDashboard = () => {
                   <Table.Cell>
                     {user.roleRequest === 'Merchant' && (
                       <HStack spacing={4}>
-                        <Button colorScheme="green" onClick={() => handleApproveMerchant(user._id)}>
+                        <Button colorPalette={"green"} variant="surface" onClick={() => handleApproveMerchant(user._id)}>
                           Approve
                         </Button>
-                        <Button colorScheme="red" onClick={() => handleRejectMerchant(user._id)}>
+                        <Button colorPalette={"red"} variant="surface" onClick={() => handleRejectMerchant(user._id)}>
                           Reject
                         </Button>
                       </HStack>
@@ -142,7 +132,6 @@ const AdminDashboard = () => {
           </Table.Root>
         </Box>
 
-        {/* Product Management Table */}
         <Box>
           <Heading size="md" mb={2}>Product Management</Heading>
           <Table.Root size="sm">
@@ -161,7 +150,7 @@ const AdminDashboard = () => {
                   <Table.Cell>${product.price}</Table.Cell>
                   <Table.Cell>{product.stock}</Table.Cell>
                   <Table.Cell>
-                    <Button colorScheme="red" onClick={() => handleDeleteProduct(product._id)}>
+                    <Button colorPalette={"red"} variant="surface" onClick={() => handleDeleteProduct(product._id)}>
                       Delete
                     </Button>
                   </Table.Cell>
@@ -171,13 +160,12 @@ const AdminDashboard = () => {
           </Table.Root>
         </Box>
 
-        {/* Pagination Controls */}
         <HStack justifyContent="center" spacing={4}>
-          <Button onClick={() => setPage((prev) => Math.max(prev - 1, 1))} colorScheme="blue">
+          <Button onClick={() => setPage((prev) => Math.max(prev - 1, 1))} colorPalette={"blue"} variant="outline">
             Previous
           </Button>
           <Text>Page {page}</Text>
-          <Button onClick={() => setPage((prev) => prev + 1)} colorScheme="blue">
+          <Button onClick={() => setPage((prev) => prev + 1)} colorPalette={"blue"} variant="outline">
             Next
           </Button>
         </HStack>

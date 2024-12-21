@@ -34,7 +34,6 @@ const ProductCard = (prop) => {
   };
 
   const handleUpdateProduct = async (productID, updatedProduct) => {
-    console.log(`${JSON.stringify(product)} : ${prop.product} : ${product.name} : ${product.price}  ` );
 
     try {
       const { success, message } = await updateProduct(productID, updatedProduct);
@@ -55,14 +54,16 @@ const ProductCard = (prop) => {
   const handleAddToCart = async () => {
     if(!user){
       navigate("/login");
+    }else if (user.username === product.owner){ 
+      toast.error("you cant buy your own product");
+      return;
     }else{
-    
-    try {
-      await addToCart(product._id, 1);
-      toast.success("Product added to cart!");
-    } catch (error) {
-      toast.error("Failed to add product to cart.");
-    }
+      try {
+        await addToCart(product._id, 1);
+        toast.success("Product added to cart!");
+      } catch (error) {
+        toast.error("Failed to add product to cart.");
+      }
     }
   };
 
@@ -73,7 +74,7 @@ const ProductCard = (prop) => {
       overflow="hidden"
       transition="all 0.3s"
       _hover={{ transform: "translateY(-5px)", shadow: "xl" }}
-      bg={bg}
+      bg={"teal.200"}
     >
       <Image src={`${base}/uploads/${product.image}`} alt={product.name} h={48} w="full" objectFit="cover" />
 
@@ -82,21 +83,21 @@ const ProductCard = (prop) => {
           {product.name}
         </Heading>
 
-        <Text fontWeight="bold" fontSize="xl" color={textColor} mb={4}>
+        <Text fontWeight="bold" fontSize="xl" color={"gray.600"} mb={4}>
           ${product.price}
         </Text>
 
         <HStack spacing={2}>
-          <Button colorScheme="cyan" variant="solid" onClick={handleAddToCart}>
+          <Button colorPalette="orange" color={"gray.800"} variant="subtle" onClick={handleAddToCart}>
             Add to Cart
           </Button>
 
           {user && (user.role === "admin" || user.username === product.owner) && (
             <>
-              <Button colorScheme="cyan" variant="solid" onClick={() => setIsOpen(true)}>
+              <Button color="cyan.500" variant="solid" onClick={() => setIsOpen(true)}>
                 <EditIcon fontSize={15} />
               </Button>
-              <Button colorScheme="red" variant="solid" onClick={() => handleDeleteProduct(product._id)}>
+              <Button color="red.500" variant="solid" onClick={() => handleDeleteProduct(product._id)}>
                 <DeleteIcon fontSize={15} />
               </Button>
             </>
@@ -109,7 +110,7 @@ const ProductCard = (prop) => {
           Edit Product
         </Heading>
         <VStack spacing={4}>
-          <Text mb={2}>Product name</Text>
+          <Text mb={1}>Product name</Text>
           <Input
             placeholder="Product Name"
             name="name"
@@ -117,7 +118,7 @@ const ProductCard = (prop) => {
             onChange={(e) => setUpdatedProduct({ ...updatedProduct, name: e.target.value })}
             required 
           />
-          <Text mb={2}>Price</Text>
+          <Text mb={1}>Price</Text>
           <Input
             placeholder="Price"
             name="price"
@@ -129,10 +130,10 @@ const ProductCard = (prop) => {
         </VStack>
 
         <HStack spacing={4} mt={6}>
-          <Button colorScheme="cyan" onClick={() => handleUpdateProduct(product._id, updatedProduct)}>
+          <Button colorPalette="cyan" onClick={() => handleUpdateProduct(product._id, updatedProduct)}>
             Confirm
           </Button>
-          <Button variant="outline" onClick={() => setIsOpen(false)}>
+          <Button colorPalette="red" variant="outline" onClick={() => setIsOpen(false)}>
             Cancel
           </Button>
         </HStack>

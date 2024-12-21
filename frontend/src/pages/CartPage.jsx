@@ -11,8 +11,6 @@ const CartPage = () => {
   const navigate = useNavigate();
   const handleBuy = async (e) => {
       e.preventDefault();
-      // console.log("Sending data to server:", formData);
-  
       try {
         await buyCartItems();
         toast.success('you purchase complete');

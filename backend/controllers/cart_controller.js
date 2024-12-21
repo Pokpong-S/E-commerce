@@ -29,14 +29,11 @@ export const addToCart = async (req, res) => {
       return res.status(400).json({ success: false, message: "Insufficient stock available" });
     }
 
-    // console.log("Request user ID:", req.user);
     const user = await User.findById(req.user.userId);
-    // console.log("Fetched user:", user);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
     if (!user.Cart) {
-      // console.log("Cart undefined");
       user.Cart = [];
     }
     const cartItemIndex = user.Cart.findIndex(item => item.product.toString() === productId);

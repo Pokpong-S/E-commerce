@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { Box, Button, Input, HStack, Text } from '@chakra-ui/react';
+import { Box, Button, Input, HStack, Text , IconButton } from '@chakra-ui/react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/auth';
+import { CiShoppingCart , CiLogout } from "react-icons/ci";
+import { LuSearch } from "react-icons/lu";
+import { CgProfile } from "react-icons/cg";
 
 const Navbar = () => {
   const { user, logout } = useAuthStore();
@@ -32,14 +35,20 @@ const Navbar = () => {
             _focus={{ borderColor: "cyan.700" }}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <Button onClick={handleSearch}>Search</Button>
+          <IconButton onClick={handleSearch}>
+              <LuSearch />
+          </IconButton>
           {user ? (
             <>
               <Link to="/cart">
-                <Button>Cart</Button>
+                <IconButton>
+                  <CiShoppingCart />
+                </IconButton>
               </Link>
               <Link to="/profile">
-                <Button>Profile</Button>
+                <IconButton rounded="full">
+                  <CgProfile />
+                </IconButton>
               </Link>
               {user.role === 'Merchant' && (
                 <Link to="/create">
@@ -51,12 +60,16 @@ const Navbar = () => {
                   <Button>Admin</Button>
                 </Link>
               )}
-              <Button onClick={handdlelogout}>Logout</Button>
+              <IconButton onClick={handdlelogout} >
+                  <CiLogout />
+              </IconButton >
             </>
           ) : (
             <>
               <Link to="/login">
-                <Button>Login</Button>
+                <Button>
+                  Login
+                  </Button>
               </Link>
               <Link to="/signup">
                 <Button>Sign Up</Button>

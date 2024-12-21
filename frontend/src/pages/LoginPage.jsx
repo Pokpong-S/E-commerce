@@ -20,9 +20,6 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // console.log("Sending data to server:", formData);
-
     try {
       await login(formData.username, formData.password);
       toast.success('login success');

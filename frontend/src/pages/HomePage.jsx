@@ -8,7 +8,6 @@ const HomePage = () => {
   const { fetchProducts, products } = useProductstore();
   const { user } = useAuthStore();
   const [loading, setLoading] = useState(true);
-  // console.log( `${user}`);
   useEffect(() => {
     const loadProducts = async () => {
       await fetchProducts();
@@ -45,7 +44,6 @@ const HomePage = () => {
             w="full"
           >
             {products.map((product) => {
-                // console.log(product);
                 return <ProductCard key={product._id} product={product} />;
                 
               })}

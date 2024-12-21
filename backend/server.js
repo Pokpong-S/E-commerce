@@ -17,21 +17,8 @@ app.use('/auth',userRoutes);
 app.use('/cart',cartRoutes);
 app.use('/admin',adminRoutes);
 app.use('/uploads', express.static(path.join(path.resolve(), 'uploads')));
-app.get('/test',(req, res) => {
-    res.send("hello");
-})
-
-// const __dirname = path.resolve();
-// if(process.env.NODE_ENV == "productioin"){
-//     app.use(express.static(path.join(__dirname,"/frontend/dist")));
-//     app.get("*", (req,res) =>{
-//         res.sendFile(path.resolve(__dirname,"frontend","dist","index.html"));
-//     })
-// }
-
 app.listen(PORT , () => {
     connectDB();
     console.log(`Sever started at http://localhost:${PORT}`)
 });
 
-// mlzbsM9lmmJF2hEu

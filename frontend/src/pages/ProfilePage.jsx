@@ -1,15 +1,5 @@
-// ProfilePage.jsx
 import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Text, 
-  VStack, 
-  Button,  
-  HStack, 
-  Heading, 
-  Image, 
-  Textarea
-} from '@chakra-ui/react';
+import { Box, Text, VStack, Button,  HStack, Heading, Image, Textarea } from '@chakra-ui/react';
 import Modal from "react-modal";
 import { useAuthStore } from '../store/auth.js';
 import { useProductstore } from '../store/product.js';
@@ -97,7 +87,7 @@ const ProfilePage = () => {
       <Heading mb={4} color="brand.700">Welcome, {user.username}</Heading>
 
       <VStack align="stretch" spacing={6}>
-        {/* Purchase History Section */}
+         {/* Purchase History Section  */}
         <Box p={8}>
             <Heading mb={4}>Welcome, {user.username}</Heading>
             <VStack spacing={6}>
