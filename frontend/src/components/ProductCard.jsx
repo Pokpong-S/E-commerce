@@ -8,17 +8,15 @@ import { useCartStore } from "../store/cart.js";
 import { toast } from "react-toastify";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { useAuthStore } from "../store/auth"; 
-// import { useColorModeValue } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 const base = import.meta.env.base_port;
 Modal.setAppElement("#root");
 
-const ProductCard = (prop) => {
-  const{ product } = prop
+const ProductCard = (prod) => {
+  const { product } = prod
   const [updatedProduct, setUpdatedProduct] = useState(product);
   const [isOpen, setIsOpen] = useState(false);
 
-  const textColor = ("gray.500")
-  const bg = ("cyan.200")
 
   const { updateProduct, deleteProduct } = useProductstore();
   const { addToCart } = useCartStore(); 
@@ -42,7 +40,7 @@ const ProductCard = (prop) => {
         toast.success(message || "Product updated successfully!");
       } else {
         toast.error(message || "Failed to update product.");
-      }
+      }v 
     } catch (error) {
       console.error("Error updating product:", error);
       toast.error("An unexpected error occurred.");
@@ -76,11 +74,20 @@ const ProductCard = (prop) => {
       _hover={{ transform: "translateY(-5px)", shadow: "xl" }}
       bg={"teal.200"}
     >
-      <Image src={`${base}/uploads/${product.image}`} alt={product.name} h={48} w="full" objectFit="cover" />
-
+        <Image
+          src={`${base}/uploads/${product.image}`}
+          alt={product.name}
+          h={48}
+          w="full"
+          objectFit="cover"
+          onClick={() => navigate(`/product/${product._id}`)}
+          cursor="pointer"
+        />
       <Box p={4}>
         <Heading as="h3" size="md" mb={2}>
-          {product.name}
+          <Link to={`/product/${product._id}`}>
+            {product.name}
+          </Link>
         </Heading>
 
         <Text fontWeight="bold" fontSize="xl" color={"gray.600"} mb={4}>

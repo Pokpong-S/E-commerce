@@ -12,9 +12,7 @@ export const useCartStore = create((set, get) => ({
     try {
       set({ loading: true, error: null, successMessage: null });
       const { user } = useAuthStore.getState();
-      // console.log(`token ${user?.token}`);
       if (!user?.token) {
-        // console.log(`token ${user?.token}`);
         set({ error: "Authentication token not found", loading: false });
         return;
       }
@@ -35,7 +33,6 @@ export const useCartStore = create((set, get) => ({
       });
     }
   },
-
   addToCart: async (productId, quantity = 1) => {
     try {
       set({ error: null, successMessage: null });
@@ -61,32 +58,6 @@ export const useCartStore = create((set, get) => ({
     } catch (error) {
       set({ 
         error: error.response?.data?.message || "Failed to add product to cart" 
-      });
-    }
-  },
-  // not in use 
-  removeFromCart: async (productId) => {
-    try {
-      set({ error: null, successMessage: null ,loading: true});
-      const { user } = useAuthStore.getState();
-      console.log(`Token used: ${productId}`);
-      if (!user?.token) {
-        console.log(`token ${user?.token}`);
-        set({ error: "Authentication token not found", loading: false });
-        return;
-      }
-
-      const response = await axios.delete(`${base}/cart/${productId}`,
-         {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-      set({ cart: response.data.cart ,loading: false, successMessage: "Product removed from cart" });
-    } catch (error) {
-      console.log(`removefromcart : ${error}`)
-      set({ 
-        error: error.response?.data?.message || "Failed to remove product from cart" ,loading: false
       });
     }
   },

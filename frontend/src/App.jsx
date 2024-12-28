@@ -8,6 +8,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import Navbar from './components/Navbar';
+import ProductPage from './pages/ProductPage';
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/product/:id" element={<ProductPage/>}/>
       </Routes>
     </>
   );

@@ -32,7 +32,7 @@ const HomePage = () => {
         </Text>
 
         {loading ? (
-          <Spinner size="xl" color="brand.500" /> 
+          <Spinner size="xl" color="blue.400" /> 
           ) : ( 
           <SimpleGrid
             columns={{
@@ -44,8 +44,7 @@ const HomePage = () => {
             w="full"
           >
             {products.map((product) => {
-                return <ProductCard key={product._id} product={product} />;
-                
+                 return <ProductCard key={product._id} product={product} />
               })}
           </SimpleGrid>
          )
