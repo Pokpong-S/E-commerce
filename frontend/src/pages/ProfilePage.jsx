@@ -13,6 +13,7 @@ const ProfilePage = () => {
   const { user } = useAuthStore();
   const { products, deleteProduct } = useProductstore();
   const [requestDetails, setRequestDetails] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
   const [purchaseHistory, setPurchaseHistory] = useState([]);
 
   useEffect(() => {
@@ -87,7 +88,7 @@ const ProfilePage = () => {
       <Heading mb={4} color="brand.700">Welcome, {user.username}</Heading>
 
       <VStack align="stretch" spacing={6}>
-         {/* Purchase History Section  */}
+         
         <Box p={8}>
             <Heading mb={4}>Welcome, {user.username}</Heading>
             <VStack spacing={6}>
@@ -109,7 +110,6 @@ const ProfilePage = () => {
             </VStack>
         </Box>
 
-        {/* Request to Become a Merchant */}
         {user.role !== 'Merchant' && user.role !== 'admin' && (
           <Box>
             <Button onClick={() => setIsOpen(true)} colorScheme="cyan" mb={4}>
@@ -141,7 +141,7 @@ const ProfilePage = () => {
           </Box>
         )}
 
-        {/* Merchant's Products Section */}
+       
         {user.role === 'Merchant' && (
           <Box>
             <Heading size="md" mb={2} color="brand.600">Your Products</Heading>
@@ -166,7 +166,7 @@ const ProfilePage = () => {
                         <Text>Stock: {product.stock}</Text>
                       </VStack>
                       <Button 
-                        colorScheme="red" 
+                        colorPalette="red" 
                         onClick={() => handleDelete(product._id)}
                       >
                         Delete

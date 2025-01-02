@@ -1,20 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { Container, SimpleGrid, Text, VStack, Spinner } from '@chakra-ui/react';
+import { Container, SimpleGrid, Text, VStack, Spinner, Button, HStack } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { useProductstore } from '../store/product';
 import ProductCard from '../components/ProductCard.jsx';
 import { useAuthStore } from '../store/auth.js';
+
 const HomePage = () => {
   const { fetchProducts, products } = useProductstore();
   const { user } = useAuthStore();
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   useEffect(() => {
     const loadProducts = async () => {
-      await fetchProducts();
+      setLoading(true);
+      const result = await fetchProducts(page);
+      setTotalPages(result.totalPages || 1); 
       setLoading(false);
     };
     loadProducts();
-  }, [fetchProducts]);
+  }, [fetchProducts, page]);
+
+  const handleNextPage = () => {
+    if (page < totalPages) setPage((prev) => prev + 1);
+  };
+
+  const handlePreviousPage = () => {
+    if (page > 1) setPage((prev) => prev - 1);
+  };
 
   return (
     <Container maxW="container.xl" py={12}>
@@ -32,8 +46,8 @@ const HomePage = () => {
         </Text>
 
         {loading ? (
-          <Spinner size="xl" color="blue.400" /> 
-          ) : ( 
+          <Spinner size="xl" color="blue.400" />
+        ) : (
           <SimpleGrid
             columns={{
               base: 1,
@@ -43,12 +57,11 @@ const HomePage = () => {
             gap="40px"
             w="full"
           >
-            {products.map((product) => {
-                 return <ProductCard key={product._id} product={product} />
-              })}
+            {products.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
           </SimpleGrid>
-         )
-        }
+        )}
 
         {!loading && products.length === 0 && (
           <Text fontSize="xl" textAlign="center" fontWeight="bold" color="gray.500">
@@ -59,6 +72,22 @@ const HomePage = () => {
               </Text>
             </Link>
           </Text>
+        )}
+
+        {!loading && (
+          <HStack spacing={4} justifyContent="center">
+            {page > 1 && (
+              <Button onClick={handlePreviousPage}>
+                Previous
+              </Button>
+            )}
+            <Text>Page {page} of {totalPages}</Text>
+            {page < totalPages && (
+              <Button onClick={handleNextPage}>
+                Next
+              </Button>
+            )}
+          </HStack>
         )}
       </VStack>
     </Container>

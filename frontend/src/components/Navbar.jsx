@@ -11,7 +11,6 @@ const Navbar = () => {
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
   const handdlelogout = () => {
-    console.log("hilogout");
     logout();
     navigate('/');
   }

@@ -29,22 +29,19 @@ export const useProductstore = create((set) => ({
 		set((state) => ({ products: [...state.products, data.data] }));
 		return { success: true, message: "Product created successfully" };
 	},
-	fetchProducts: async () => {
+	fetchProducts: async (page = 1) => {
 		try {
-			const res = await fetch(`${base}/api/products`);
-			const text = await res.json();  
-			// console.log("Raw response:", text);
-		
-			// const data = JSON.parse(text);  
-		
+			const res = await fetch(`${base}/api/products?page=${page}&limit=10`);
+			const data = await res.json();
 			if (!res.ok) {
-			  throw new Error(data.message || 'Failed to fetch products');
+			throw new Error(data.message || 'Failed to fetch products');
 			}
-		
-			set({ products: text.data || [] });
+			set({ products: data.data || [] });
+			return { totalPages: data.totalPages, currentPage: data.currentPage };
 		} catch (error) {
 			console.log('Error fetching products:', error);
 			set({ products: [] });
+			return { totalPages: 1, currentPage: 1 };
 		}
   },
    deleteProduct: async (Product_id) =>{

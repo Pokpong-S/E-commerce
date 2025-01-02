@@ -4,6 +4,7 @@ import { Box, Image, Text, Heading, VStack, Spinner, Stack, Button, Separator } 
 import { useProductstore } from '../store/product';
 import { useCartStore } from '../store/cart';
 import { useAuthStore } from '../store/auth';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const ProductPage = () => {
@@ -11,7 +12,8 @@ const ProductPage = () => {
   const { products, fetchProducts } = useProductstore();
   const { addToCart } = useCartStore();
   const { user } = useAuthStore();
-  const [product, setProduct] = useState(null);
+  const navigate = useNavigate();
+  const [product, setProduct] = useState();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -28,7 +30,7 @@ const ProductPage = () => {
 
   const handleAddToCart = async () => {
     if (!user) {
-      toast.error("You need to log in to add items to your cart.");
+      navigate("/login");
       return;
     }
     if (user.username === product.owner) {
