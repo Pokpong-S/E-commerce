@@ -29,21 +29,22 @@ export const useProductstore = create((set) => ({
 		set((state) => ({ products: [...state.products, data.data] }));
 		return { success: true, message: "Product created successfully" };
 	},
-	fetchProducts: async (page = 1) => {
+	fetchProducts: async (page = 1, search = '') => {
 		try {
-			const res = await fetch(`${base}/api/products?page=${page}&limit=10`);
-			const data = await res.json();
-			if (!res.ok) {
+		  const res = await fetch(`${base}/api/products?page=${page}&limit=10&search=${search}`);
+		  const data = await res.json();
+		  if (!res.ok) {
 			throw new Error(data.message || 'Failed to fetch products');
-			}
-			set({ products: data.data || [] });
-			return { totalPages: data.totalPages, currentPage: data.currentPage };
+		  }
+		  set({ products: data.data || [] });
+		  return { totalPages: data.totalPages, currentPage: data.currentPage };
 		} catch (error) {
-			console.log('Error fetching products:', error);
-			set({ products: [] });
-			return { totalPages: 1, currentPage: 1 };
+		  console.log('Error fetching products:', error);
+		  set({ products: [] });
+		  return { totalPages: 1, currentPage: 1 };
 		}
-  },
+	  },
+	  
    deleteProduct: async (Product_id) =>{
 	const { user } = useAuthStore.getState();
 	const res = await fetch(`${base}/api/products/${Product_id}`, {

@@ -3,24 +3,26 @@ import { Container, SimpleGrid, Text, VStack, Spinner, Button, HStack } from '@c
 import { Link } from 'react-router-dom';
 import { useProductstore } from '../store/product';
 import ProductCard from '../components/ProductCard.jsx';
-import { useAuthStore } from '../store/auth.js';
+import { useLocation } from 'react-router-dom';
 
 const HomePage = () => {
   const { fetchProducts, products } = useProductstore();
-  const { user } = useAuthStore();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
+  
+  const searchParams = new URLSearchParams(location.search);
+  const search = searchParams.get('search') || '';
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
-      const result = await fetchProducts(page);
-      setTotalPages(result.totalPages || 1); 
+      const result = await fetchProducts(page, search);
+      setTotalPages(result.totalPages || 1);
       setLoading(false);
     };
     loadProducts();
-  }, [fetchProducts, page]);
+  }, [fetchProducts, page, search]);
 
   const handleNextPage = () => {
     if (page < totalPages) setPage((prev) => prev + 1);

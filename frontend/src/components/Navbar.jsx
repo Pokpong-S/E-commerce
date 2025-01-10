@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect  } from 'react';
 import { Box, Button, Input, HStack, Text , IconButton } from '@chakra-ui/react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/auth';
@@ -14,8 +14,20 @@ const Navbar = () => {
     logout();
     navigate('/');
   }
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const searchQuery = params.get('search');
+    if (searchQuery) {
+      setSearch(searchQuery);
+    }
+  }, []);
   const handleSearch = () => {
     navigate(`/?search=${search}`);
+  };
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   return (
@@ -25,15 +37,16 @@ const Navbar = () => {
           <Link to="/">Product Store </Link>
         </Text>
         <HStack>
-          <Input
-            placeholder="Search products..."
-            value={search}
-            bg="cyan.100"
-            borderColor="cyan.400"
-            _hover={{ borderColor: "cyan.600" }}
-            _focus={{ borderColor: "cyan.700" }}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        <Input
+          placeholder="Search products..."
+          value={search}
+          bg="cyan.100"
+          borderColor="cyan.400"
+          _hover={{ borderColor: "cyan.600" }}
+          _focus={{ borderColor: "cyan.700" }}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyPress={handleKeyPress}
+        />
           <IconButton onClick={handleSearch}>
               <LuSearch />
           </IconButton>
